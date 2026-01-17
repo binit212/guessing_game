@@ -21,6 +21,7 @@ def init_db():
     conn.close()
 
 
+init_db()
 app = Flask(__name__)
 app.secret_key = "supersecretkey123"
 
@@ -185,5 +186,5 @@ def get_range_hint(difficulty):
 
 
 if __name__ == "__main__":
-    init_db()
+
     app.run()
