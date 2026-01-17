@@ -3,6 +3,24 @@ import random
 import sqlite3
 import time
 
+
+def init_db():
+    conn = sqlite3.connect("leaderboard.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            score INTEGER,
+            time REAL
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
 app = Flask(__name__)
 app.secret_key = "supersecretkey123"
 
@@ -39,6 +57,7 @@ def leaderboard():
     scores = get_leaderboard()
     last_player = session.pop("last_player", "")
     message = session.pop("win_message", "")
+    session.clear()
     return render_template(
         "leaderboard.html",
         scores=scores,
@@ -125,8 +144,6 @@ def home():
             session["last_player"] = player_name
             session["win_message"] = f" You won, {player_name}! Score saved."
 
-            session.clear()
-
             return redirect(url_for("leaderboard"))
 
         if attempts >= max_attempts:
@@ -168,4 +185,5 @@ def get_range_hint(difficulty):
 
 
 if __name__ == "__main__":
+    init_db()
     app.run()
