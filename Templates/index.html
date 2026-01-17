@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guessing Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎯 Guess The Number</h1>
+
+    {% if range_hint %}
+        <p>Range: {{ range_hint }}</p>
+    {% endif %}
+
+    <form method="post">
+
+        <input type="text"
+               name="player_name"
+               placeholder="Your name"
+               value="{{ player_name if player_name else '' }}"
+               {% if player_name %}readonly{% endif %}
+               required>
+
+        <select name="difficulty" required {% if difficulty %}disabled{% endif %}>
+           <option value="easy">Easy (1 - 10)</option>
+           <option value="medium">Medium (1 - 50)</option>
+           <option value="hard">Hard (1 - 100)</option>
+        </select>
+
+
+        <input type="number" name="guess" placeholder="Enter your guess" required>
+
+        <button type="submit">Guess</button>
+
+    </form>
+
+    <a href="/restart">
+        <button type="button" class="restart-btn">Restart Game</button>
+    </a>
+
+    {% if message %}
+        <div class="message
+            {% if 'Game Over' in message %}
+                lose
+            {% elif 'Too' in message or 'already' in message %}
+                warn
+            {% else %}
+                win
+            {% endif %}
+        ">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if difficulty %}
+        <p>Difficulty: {{ difficulty|capitalize }}</p>
+    {% endif %}
+
+    {% if guess_history %}
+    <div class="guess-box">
+        <h3>Your Guesses</h3>
+
+      <div class="guess-list">
+    {% for g in guess_history %}
+        <span class="guess-item {% if loop.last %}latest{% endif %}">
+            {{ g }}
+        </span>
+    {% endfor %}
+</div>
+
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

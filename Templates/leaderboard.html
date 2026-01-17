@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🏆 Leaderboard</h1>
+
+    {% if message %}
+        <div class="message win">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if scores %}
+        <table>
+
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Time (s)</th>
+            </tr>
+
+            {% for name, score, time in scores %}
+            <tr class="
+                {% if loop.index == 1 %}top-player{% endif %}
+                {% if name == last_player %} current-player {% endif %}
+            ">
+
+                <td>
+                    {% if loop.index == 1 %}
+                        🥇
+                    {% elif loop.index == 2 %}
+                        🥈
+                    {% elif loop.index == 3 %}
+                        🥉
+                    {% else %}
+                        {{ loop.index }}
+                    {% endif %}
+                </td>
+
+                <td>{{ name }}</td>
+                <td>{{ score }}</td>
+                <td>{{ time }}</td>
+
+            </tr>
+            {% endfor %}
+
+        </table>
+
+    {% else %}
+        <p>No scores yet.</p>
+    {% endif %}
+
+    <br>
+
+    <a href="/">
+        <button>Back To Game</button>
+    </a>
+
+</div>
+
+</body>
+</html>
