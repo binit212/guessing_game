@@ -3,7 +3,8 @@
 A full-stack web-based guessing game built with Flask where players compete on a live leaderboard.  
 The game includes difficulty levels, score calculation, session-based gameplay, and database-backed rankings.
 
-🔗 Live Demo: https://guessing-game-6l9j.onrender.com
+🔗 Live Demo: https://guessing-game-1-gd9r.onrender.com
+
 
 ---
 
