@@ -1,16 +1,28 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import random
-import sqlite3
 import time
+import os
+import psycopg2
+
+
+def get_db_connection():
+    database_url = os.environ.get("DATABASE_URL")
+
+    if not database_url:
+        raise Exception("DATABASE_URL not set")
+
+    conn = psycopg2.connect(database_url)
+    conn.autocommit = True
+    return conn
 
 
 def init_db():
-    conn = sqlite3.connect("leaderboard.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS scores (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             name TEXT,
             score INTEGER,
             time REAL
@@ -18,29 +30,30 @@ def init_db():
     """)
 
     conn.commit()
+    cursor.close()
     conn.close()
 
 
-init_db()
 app = Flask(__name__)
 app.secret_key = "supersecretkey123"
 
 
 def save_score(name, score, time_taken):
-    conn = sqlite3.connect("leaderboard.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO scores (name, score, time) VALUES (?, ?, ?)",
+        "INSERT INTO scores (name, score, time) VALUES (%s, %s, %s)",
         (name, score, time_taken)
     )
 
     conn.commit()
+    cursor.close()
     conn.close()
 
 
 def get_leaderboard():
-    conn = sqlite3.connect("leaderboard.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -48,6 +61,8 @@ def get_leaderboard():
     )
 
     rows = cursor.fetchall()
+
+    cursor.close()
     conn.close()
 
     return rows
@@ -58,7 +73,7 @@ def leaderboard():
     scores = get_leaderboard()
     last_player = session.pop("last_player", "")
     message = session.pop("win_message", "")
-    session.clear()
+
     return render_template(
         "leaderboard.html",
         scores=scores,
@@ -186,5 +201,5 @@ def get_range_hint(difficulty):
 
 
 if __name__ == "__main__":
-
+    init_db()
     app.run()
